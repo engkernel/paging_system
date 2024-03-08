@@ -48,6 +48,21 @@ struct virt_page{
 	struct page_pgd pgd[1024];
 };
 
+static inline struct page_pte get_pte(struct page_pmd pmd, int pte_offset)
+{
+	return pmd[pte_offset];
+};
+
+static inline struct page_pmd get_pmd(struct page_pgd pgd, int pmd_offset)
+{
+	return pgd[pmd_offset]; 
+};
+
+static inline struct page_pgd get_pgd(struct virt_page page, int pgd_offset)
+{
+	return page[pgd_offset];
+};
+
 /* convert virtual address to its corresponds physical */
 void* virt_to_phys(void* virt_addr){
 	struct page_pgd pgd_offset;
@@ -58,6 +73,12 @@ void* virt_to_phys(void* virt_addr){
 	pmd_offest = PMD_OFFSET(virt_addr);
 	pte_offset = PTE_OFFSET(virt_addr);
 
-	
+	/*
+	 * we just try to emphasis a dumb solution to get big picture
+	 * 	pgd[pgd_offset] ->
+	 			  pmd[pmgd_offest] ->
+				  			pte[pte_offset];
+	 */
+		
 }
 
