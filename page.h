@@ -1,6 +1,18 @@
 /*
 * pages definitions
 */
+#define PGD_OFFSET(addr) (addr >> 22 & 0xFFC00000)
+#define PMD_OFFSET(addr) (addr >> 12 & 0x3FF000)
+#define PTE_OFFSET(addr) (addr & 0xFFF)
+
+struct page_attr{
+	unsigned int present;
+	unsigned int protection;
+	unsigned int reference;
+	unsigned int caching;
+	unsigned int dirty;
+};
+
 struct page_pte{
 	/*
 	 * page_frame_number
@@ -11,12 +23,8 @@ struct page_pte{
 	 * dirty
 	 */
 	unsigned int page_pfn;
-	unsigned int present;
-	unsigned int protection;
-	unsigned int reference;
-	unsigned int caching;
-	unsigned int dirty;
-};
+	struct page_attr attr;
+	};
 
 struct page_pmd{
 	/*
@@ -29,7 +37,7 @@ struct page_pgd{
 	struct page_pmd pmd[1024];
 };
 
-struct virtual_page{
+struct virt_page{
 	/*
 	we would like to have 3 level paging
 	 - 32 bits
@@ -39,3 +47,17 @@ struct virtual_page{
 	 */
 	struct page_pgd pgd[1024];
 };
+
+/* convert virtual address to its corresponds physical */
+void* virt_to_phys(void* virt_addr){
+	struct page_pgd pgd_offset;
+	struct page_pmd pmd_offset;
+	struct page_pte pte_offset;
+
+	pgd_offset = PGD_OFFSET(virt_addr);	
+	pmd_offest = PMD_OFFSET(virt_addr);
+	pte_offset = PTE_OFFSET(virt_addr);
+
+	
+}
+
