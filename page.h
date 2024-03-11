@@ -37,7 +37,7 @@ struct page_pgd{
 	struct page_pmd pmd[1024];
 };
 
-struct virt_page{
+struct virt_page_table{
 	/*
 	we would like to have 3 level paging
 	 - 32 bits
@@ -63,11 +63,15 @@ static inline struct page_pgd get_pgd(struct virt_page page, int pgd_offset)
 	return page[pgd_offset];
 };
 
+/* we just define a variable as a table */
+static virt_page_table table; 
+
 /* convert virtual address to its corresponds physical */
 void* virt_to_phys(void* virt_addr){
 	struct page_pgd pgd_offset;
 	struct page_pmd pmd_offset;
 	struct page_pte pte_offset;
+	void* pfn;
 
 	pgd_offset = PGD_OFFSET(virt_addr);	
 	pmd_offest = PMD_OFFSET(virt_addr);
@@ -79,6 +83,8 @@ void* virt_to_phys(void* virt_addr){
 	 			  pmd[pmgd_offest] ->
 				  			pte[pte_offset];
 	 */
-		
+	pfn = get_pte(get_pmd(get_pgd(table, pgd_offset), pmd_offset), pte_offset);		
+
+	return pfn;
 }
 
